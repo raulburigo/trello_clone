@@ -27,7 +27,7 @@
         <div class="row">
             <!-- primeiro cria o espaço para uma lista -->
             <div class="col" ng-repeat="cat in categories" id="listSpace{{cat.boardPosition}}">
-                <div drop-on-me drag-me id="cat-{{cat.id}}" class="card pb-4 bg-light text-center">
+                <div drop-on-me id="cat-{{cat.id}}" class="card pb-4 bg-light text-center">
                     <div class="card-header" role="button">{{ cat.name }}</div>
                     <div class="card todo m-2" drag-me role="button" ng-click=toggleModal(todo.id) ng-repeat="todo in cat.todos" id=todo-{{todo.id}}>
                         <div class="card-body">
