@@ -3,61 +3,92 @@ angular
   .directive('dragMe', dragMe)
   .directive('dropOnMe', dropOnMe);
 
-dragMe.$inject = [];
+dragMe.$inject = ['$timeout'];
 
-function dragMe() {
+function dragMe($timeout) {
   var DDO = {
     restrict: 'A',
     link: function(scope, element, attrs) {
-      scope.$root.overElId = null;
       element.prop('draggable', true);
       element.on('dragstart', function(event) {
         event.dataTransfer.setData("text", attrs.id)
-        element.addClass("bg-secondary")
+        $timeout(function() {
+          element.addClass("d-none");
+        }, 0);
+        event.stopPropagation();
       });
       element.on('dragend', function(event) {
-        element.removeClass("bg-secondary")
+        element.removeClass("d-none")
       });
-      element.on('dragover', function(event) {
+      element.on('dragenter', function(event) {
         event.preventDefault();
+        scope.lastEnter = event.target
         scope.$root.overElId = attrs.id;
-      })
+      });
+      element.on('dragleave', function(event) {
+        event.preventDefault();
+        if (scope.lastEnter === event.target) {
+          scope.$root.overElId = null;
+        }
+      });
     }
   };
   return DDO;
 }
 
-dropOnMe.$inject = [];
-function dropOnMe() {
+dropOnMe.$inject = ['todosAPI'];
+function dropOnMe(todosAPI) {
   var DDO = {
     restrict: 'A',
+    scope: {
+      cat: '='
+    },
     link: function(scope, element, attrs) {
+      scope.placeholder = document.createElement("DIV");
+      scope.placeholder.classList.add("placeholder");
+      scope.removePlaceholders = function () {
+        Array.from(document.getElementsByClassName("placeholder"))
+          .forEach(function (el) {
+            el.remove()
+          })
+      }
       element.on('dragover', function(event) {
         event.preventDefault();
       });
+      element.on('dragenter', function(event) {
+        event.preventDefault();
+        if (scope.$root.overElId) {
+          element[0].insertBefore(
+            scope.placeholder, document.getElementById(scope.$root.overElId)
+            )
+          } else {
+            element[0].appendChild(scope.placeholder)
+        }
+        scope.lastEnter = event.target
+      });
+      element.on('dragleave', function(event) {
+        event.preventDefault();
+        if (scope.lastEnter === event.target) {
+          scope.removePlaceholders();
+        }
+      });
       element.on('drop', function(event) {
         event.preventDefault();
-        var dropTarget = null;
-        var nextTarget = event.target;
-        while (!dropTarget) {
-          if ("drop-on-me" in nextTarget.attributes) {
-            dropTarget = nextTarget;
-          } else {
-            nextTarget = nextTarget.parentElement;
-          }
-        }
-        var overElId = scope.$root.overElId;
         var draggedElId = event.dataTransfer.getData("text");
-        var categoryId = attrs.id.split("-")[1];
-        var todoId = draggedElId.split("-")[1]
-        var beforeEl = document.getElementById(overElId);
         var dragEl = document.getElementById(draggedElId);
-        if (beforeEl.parentNode != dropTarget) {
-          beforeEl = document.getElementById("button-cat-" + categoryId);
-        }
-        dropTarget.insertBefore(dragEl, beforeEl)
-        console.log("API CALL", categoryId, "/", todoId)
-        // API call
+        element[0].insertBefore(dragEl, scope.placeholder)
+        scope.removePlaceholders();
+        // essa parte não se aproveita
+        var newPostion = Array.from(element[0].children).indexOf(scope.placeholder) - 1;
+        var categoryId = scope.cat.id;
+        var todoId = draggedElId.split("-")[1]
+        todosAPI.updateTodo(todoId, 
+          {
+            "categoryId": categoryId,
+            "position": newPostion,
+          }
+        )
+        scope.$root.overElId = null;
       });
     }
   };

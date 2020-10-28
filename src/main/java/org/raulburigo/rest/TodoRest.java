@@ -2,8 +2,8 @@ package org.raulburigo.rest;
 
 import java.util.InputMismatchException;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,10 +17,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.jboss.logging.Logger;
-import org.raulburigo.models.Category;
+import org.raulburigo.dto.CreateTodoDto;
+import org.raulburigo.dto.UpdateTodoDto;
 import org.raulburigo.models.Todo;
 import org.raulburigo.service.TodoService;
+
+import io.quarkus.security.identity.SecurityIdentity;
 
 
 @Path("/todos")
@@ -31,13 +33,17 @@ public class TodoRest {
     @Inject
     TodoService service;
 
+    @Inject
+    SecurityIdentity identity;
+
     @POST
     @Path("/")
+    // @RolesAllowed("user")
     @Operation(
         summary = "Create new Todo",
         description = "Creates a new Todo in the Todo List."
     )
-    public Response adicionarTodo(Todo newTodo) {
+    public Response adicionarTodo(CreateTodoDto newTodo) {
         Todo response;
         try {
             response = service.criarTodo(newTodo);
@@ -82,60 +88,17 @@ public class TodoRest {
         service.deleteById(id);
         return Response
             .status(Status.ACCEPTED)
-            .entity("todo excluído com sucesso")
+            .entity("{'message': 'Todo excluído com sucesso'}")
             .build();
     }
     
     @PUT
     @Path("/{id}/update")
-    public Response alterarTodo(@PathParam("id") long id, Todo updatedTodo) {
+    public Response alterarTodo(@PathParam("id") long id, UpdateTodoDto updateDto) {
         return Response
             .status(Status.OK)
-            .entity(service.alterarTodo(id, updatedTodo))
+            .entity(service.alterarTodo(id, updateDto))
             .build();
     }
 
-    @Transactional
-    @GET
-    @Path("/{categoryId}/{todoId}")
-    public Response moverTodo(@PathParam("categoryId") Long categoryId, @PathParam("todoId") Long todoId) {
-        Todo todo = service.buscarId(todoId);
-        Category cat = Category.findById(categoryId);
-        cat.persist();
-        todo.setCategory(cat);
-        todo.persist();
-        return Response
-            .status(Status.OK)
-            .entity(todo)
-            .build();
-    }
-
-
-    @GET
-    @Path("/hello")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        Logger.getLogger(TodoRest.class).info("hello");
-        return "hello";
-    }
-    
 }
-
-    // @GET
-    // @Path("/completed")
-    // public Response listarCompletos() {
-    //     return Response
-    //         .status(Status.OK)
-    //         .entity(service.listarCompletas())
-    //         .build();
-    // }
-
-    // @GET
-    // @Path("/page")
-    // public Response listarPaginado() {
-    //     return Response
-    //         .status(Status.OK)
-    //         .entity(service.pagination())
-    //         .build();
-    // }    
-    

@@ -25,5 +25,14 @@ public class CategoryService {
     public Category createCategory(CreateCategoryDto dto) {
         return dao.createCategory(dto);
     }
+    
+    public Category buscarId(long catId) {
+        return dao.buscarId(catId);
+    }
+    
+    public void deleteById(long catId) {
+        dao.deleteById(catId);
+    }
+
 
 }

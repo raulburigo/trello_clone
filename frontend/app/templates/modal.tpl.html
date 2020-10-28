@@ -3,7 +3,16 @@
     <div class='ng-modal-dialog' ng-style='dialogStyle'>
         <div class='ng-modal-close' ng-click='hideModal()'>X</div>
         <div class="container mt-3">
-            <h1 class="text-center">Detalhes do Todo {{id}}</h3>
+            <h1 class="text-center">{{todo.title}}</h3>
+                <p>Criado {{ todo.createdAt | date:'fullDate'}}
+                <span class="badge badge-success">Success</span>
+                <input type="checkbox" ng-model="todo.completed" ng-change="checkCompleted()">
+                </p>
+                <hr>
+                <div ng-repeat="activity in todo.activities">
+                    {{ activity.username }} {{ activity.type }} at {{ activity.createdAt | date:'short' }}
+                </div>
+                <button class="btn btn-danger" ng-click="handleDeleteTodoBtn(todo.id)">Excluir ToDo</button>
         </div>
     </div>
 </div>

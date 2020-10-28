@@ -1,15 +1,19 @@
 package org.raulburigo.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.json.bind.annotation.JsonbTransient;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -22,18 +26,18 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 @Entity
 @Table(name="todos")
 public class Todo extends PanacheEntityBase {
-    
+
     @Id
     @SequenceGenerator(
         name = "todoSequence",
         sequenceName = "todo_id_seq"
     )
-	@GeneratedValue(
+    @GeneratedValue(
         strategy = GenerationType.SEQUENCE,
         generator = "todoSequence"
     )
-	public Long id;
-
+    private Long id;
+    
     @Column(name = "title", nullable = false)
     private String title;
     
@@ -47,12 +51,39 @@ public class Todo extends PanacheEntityBase {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @ManyToOne(optional = true)
+    
+    @Column(nullable = false)
+    private Long position;
+    
+    @ManyToOne(optional = false)
     @JsonbTransient
     @JoinColumn(name = "category_id")
     private Category category;
+    
+    @OneToMany(
+        mappedBy = "todo",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.EAGER
+    )
+    public List<Activity> activities;
 
+    public Long getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
     public Category getCategory() {
         return this.category;
     }
@@ -61,14 +92,6 @@ public class Todo extends PanacheEntityBase {
         this.category = category;
     }
 
-	public Long getId() {
-        return id;
-	}
-    
-	public void setId(Long id) {
-        this.id = id;
-	}
-    
     public String getTitle() {
         return this.title;
     }

@@ -1,0 +1,51 @@
+<div class="container-fluid">
+    <h1 class="display-4 text-center py-4">Zé Trello</h1>
+    <button class="btn btn-primary" ng-show=!userProfile.profile ng-click=loginBtn()>login</button>
+    <button class="btn btn-primary" ng-show=!userProfile.profile ng-click=registerBtn()>registrar</button>
+    <button class="btn btn-danger" ng-show=userProfile.profile ng-click=logoutBtn()>logout</button>
+    <hr>
+    <div class="row">
+        <!-- primeiro cria o espaço para uma lista -->
+        <div class="col" ng-repeat="cat in categories" id="listSpace{{cat.boardPosition}}">
+            <!-- elemento de lista -->
+            <div class="card pb-4 bg-light">
+                <div drop-on-me cat=cat>
+                    <div class="card-header text-center" role="button">{{ cat.name }}</div>
+                    <!-- lista de todos -->
+                    <div class="card todocard mt-2 mx-2" drag-me todo=todo group="todos" role="button" ng-click=toggleModal(todo) ng-repeat="todo in cat.todos | orderBy:'position'" id=todo-{{todo.id}}>
+                        <div class="card-body p-2">
+                            <span class="card-text text-dark">{{ todo.title }}</span>
+                        </div>
+                    </div>
+                    <!-- fim da lista de todos -->
+                </div>
+                <form class="card mt-2 mx-2" name=newTodoForm ng-show="showNewTodoForm[{{cat.id}}]">
+                    <div class="card-body p-2">
+                        <textarea autogrow class="card-text inputeste" ng-model="$root.newTodo" placeholder="digite a nova tarefa"></textarea>
+                    </div>
+                </form>
+                <div class="row pl-4" ng-show="showNewTodoForm[{{cat.id}}]">
+                    <button type="submit" ng-click='addTodo($root.newTodo, cat.id)' class="btn btn-sm btn-success mx-2 p-2">Incluir tarefa</button>
+                    <button ng-click=toggleNewTodoForm(cat.id) class="btn btn-sm btn-light mx-2 p-2"><i class="fa fa-times mx-auto"></i></button>
+                </div>
+                <button ng-click=toggleNewTodoForm(cat.id) ng-show="!showNewTodoForm[{{cat.id}}]" class="btn btn-sm btn-secondary mt-2 mx-2 p-2"><i class="fa fa-plus pr-2"></i>Adicionar novo item</button>
+            </div>
+        </div>
+        <div class="col">
+            <form class="card mx-2" name=newCatForm ng-show="showNewCatForm">
+                <div class="card-body p-2">
+                    <textarea autogrow class="card-text inputeste" ng-model="newCategory" placeholder="nova lista"></textarea>
+                </div>
+            </form>
+                <div class="row pl-4" ng-show="showNewCatForm">
+                    <button ng-click=addCategory(newCategory) class="btn btn-success btn-sm mx-2 p-2">Incluir lista</button>
+                    <button ng-click="showNewCatForm = false;" class="btn btn-sm btn-light mx-2 p-2"><i class="fa fa-times mx-auto"></i></button>
+                </div>
+                <button ng-click="showNewCatForm = true;" ng-show="!showNewCatForm" class="btn btn-block btn-info p-2 mx-2"><i class="fa fa-plus pr-2"></i>Adicionar Categoria</button>
+        </div>
+    </div>
+</div>
+
+<modal-dialog show='modalShown' todo='state.modalTodo' width='750px' height='60%'>
+</modal-dialog>
+

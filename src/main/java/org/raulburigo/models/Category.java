@@ -22,7 +22,6 @@ public class Category extends PanacheEntity {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-
     public List<Todo> todos;
 
     public String getName() {
@@ -32,5 +31,6 @@ public class Category extends PanacheEntity {
     public void setName(String name) {
         this.name = name;
     }
+
 
 }

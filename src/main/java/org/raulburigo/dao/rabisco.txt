@@ -1,0 +1,18 @@
+
+
+
+
+Fulano atualizou descrição em tal data
+Fulano mudou de lista em tal data
+Beltrano marcou como concluída em tal data
+Ciclano criou uma deadline em tal data
+Beltrano adicionou Ciclano ao quadro em tal data
+
+
+
+1 cartão para N atualizações
+
+acho que o melhor lugar para gerar as notificações 
+é dentro do método de atualização dentro da todo service
+
+claro que dentro da 

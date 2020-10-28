@@ -2,7 +2,7 @@
     "use strict";
 
     angular.module('zeTrello')
-        .service('todosAPI', function ($http, constants) {
+        .service('todosAPI', function ($http, constants, trelloFactory) {
             this.lookUp = function (method, url='', data) {
                 return $http({
                     method: method.toUpperCase(),
@@ -22,25 +22,29 @@
                 return this.lookUp('get', '/categories')
             }
 
-            // this.createRestaurant = function (restaurant) {
-            //     return this.yelpLookUp('post', '', restaurant)
-            // }
-
-            // this.deleteRestaurant = function (id) {
-            //     return this.yelpLookUp('delete', `/${id}/`)
-            // }
-
-            // this.getRestaurantById = function (id) {
-            //     return this.yelpLookUp('get', `/${id}/`)
-            // }
+            this.getTodoById = function (id) {
+                return this.lookUp('get', `/todos/${id}`)
+            }
             
-            // this.updateRestaurant = function (id, data) {
-            //     return this.yelpLookUp('put', `/${id}/`, data)
-            // }
+            this.updateTodo = function (todoId, todo) {
+                return this.lookUp('put', `/todos/${todoId}/update`, todo)
+            }
 
-            // this.addReview = function (id, review) {
-            //     return this.yelpLookUp('post', `/${id}/addreview`, review)
-            // }
+            this.createTodo = function (todo) {
+                return this.lookUp('post', '/todos', todo)
+            }
+
+            this.createCategory = function (category) {
+                return this.lookUp('post', '/categories', category)
+            }
             
+            this.deleteTodo = function (id) {
+                return this.lookUp('delete', `/todos/${id}/delete`)
+            }
+
+            this.deleteCategory = function (id) {
+                return this.lookUp('delete', `/categories/${id}/delete`)
+            }
+
         })
 })();
